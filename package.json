@@ -1,25 +1,31 @@
 {
-  "name": "flash_cameras_using_node",
+  "name": "nodejs-resurrector",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "proxy": "http://localhost:3001",
   "scripts": {
     "start": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnshulYbd/nodejs-resurrector.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnshulYbd/nodejs-resurrector/issues"
+  },
+  "homepage": "https://github.com/AnshulYbd/nodejs-resurrector#readme",
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "formidable": "^2.1.1",
     "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
     "nodemon": "^2.0.22",
     "path": "^0.12.7",
-    "scp2": "^0.5.0",
-    "simple-ssh": "^1.1.1",
-    "socket.io": "^4.6.1",
-    "ssh2": "^1.12.0"
+    "simple-ssh": "^1.1.1"
   }
 }
