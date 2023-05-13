@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 var path = require('path');
-
 var SSH = require('simple-ssh');
 var ssh = new SSH({
     host: "192.168.208.51",
@@ -10,17 +9,16 @@ var ssh = new SSH({
     pass: 'bdstum01r21'
 });
 // with commonJS
-//var client = require('scp2');
+var client = require('scp2');
 let formidable = require('formidable');
 let fs = require('fs');
+
 // middleware that is specific to this router
 router.use((req, res, next) => {
   console.log('Time: ', Date.now())
   next()
 })
 
-// define the home page route
-// z
 //we need body-parser and json to get the data 
 // from html form to here
 router.post('/myform', function(req, res){
@@ -30,7 +28,6 @@ router.post('/myform', function(req, res){
     res.send('success')
 
 });
-
 
 router.post('/upload', function(req, res){
     console.log('file uploading :');
@@ -48,58 +45,39 @@ router.post('/upload', function(req, res){
             //Send a NodeJS file upload confirmation message
             var local_file_path = newpath;
             var destination_file_path = '/tmp/'+file.fileupload.originalFilename;
-            // client.scp(local_file_path, {
-            //     host: "192.168.208.51",
-            //     username: 'root',
-            //     port: 9031,
-            //     password: 'bdstum01r21',
-            //     path: '/tmp/'
-            // }, function(err) {
-            //    if(err){
-            //       console.log('There has been some error!!!');
-            //       console.log(err);
-            //       res.write('There has been some error!!!!');
-            //    }else{
-            //       console.log('succeeded copying server: ' + serverip);   
-            //       res.write('Firmware File Upload Success!');
-            //    }
-            //    var cmd = "dpkg -i "+ destination_file_path
-            //    ssh.exec( cmd, {
-            //        out: function (stdout) {
-            //            console.log(stdout);
-            //            res.write(stdout);
-            //            res.send();
-            //            },
-            //        })
-            //        .start();
-            // });
+            client.scp(local_file_path, {
+                host: "192.168.208.51",
+                username: 'root',
+                port: 9031,
+                password: 'bdstum01r21',
+                path: '/tmp/'
+            }, function(err) {
+               if(err){
+                  console.log('There has been some error!!!');
+                  console.log(err);
+                  res.write('There has been some error!!!!');
+               }else{
+                  console.log('succeeded copying server: ' + serverip);   
+                  res.write('Firmware File Upload Success!');
+               }
+               var cmd = "dpkg -i "+ destination_file_path
+               ssh.exec( cmd, {
+                   out: function (stdout) {
+                       console.log(stdout);
+                       res.write(stdout);
+                       res.send();
+                       },
+                   })
+                   .start();
+            });
         });
     });
 
     
 
 });
-async function app(res, destination_file_path) {
-    await callAsyncFunction(res, destination_file_path)
-}
-async function callAsyncFunction(res, destination_file_path)
-{
-    return new Promise(function(resolve, reject) {
-        var cmd = "dpkg -i "+ destination_file_path
-        ssh.exec( 'ls -lh', {
-            out: function (stdout) {
-                console.log(stdout);
-                res.write(stdout);
-                res.send();
-                },
-            })
-            .start();
-         
-        // may be a heavy db call or http request?
-       // resolve(a) // successfully fill promise
-    })
 
-}
+
 router.get('/about',function(req,res){
     res.sendFile(path.join(__dirname+'/about.html'));
   });
