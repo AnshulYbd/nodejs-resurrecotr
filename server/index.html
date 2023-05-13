@@ -1,27 +1,9 @@
-<form action="/myroutes/myform" method="post" >
-    <fieldset>
-        <h3>upload new firmware</h3>
-        <label>Camera IP</label>
-        <input type="text" id = "ipaddress" name="ipaddress" required>
-        <br><br>
-
-        <!-- <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="fileupload">
-            <br><br>
-            <input type="submit">
-          </form> -->
-    </fieldset>
-</form>
-
  <fieldset>
     <h3>upload new firmware</h3>
-
-    <!-- <button type ="submit">Submit</button> -->
     <form action="/myroutes/upload" method="post"  enctype="multipart/form-data">
         <label>Camera IP</label>
         <input type="text" id = "ipaddress" name="ipaddress" required>
         <br><br>
-        <!-- HTML5 file upload selector-->
         <input type="file" name="fileupload">
         <br><br>
         <input type="submit">

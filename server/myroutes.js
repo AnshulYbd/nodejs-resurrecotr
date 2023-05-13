@@ -30,13 +30,19 @@ router.post('/myform', function(req, res){
 });
 
 router.post('/upload', function(req, res){
-    console.log('file uploading :');
-    var serverip = req.body.ipaddress;
-     console.log(serverip)
-    // //Create an instance of the form object
+
     let form = new formidable.IncomingForm();
-    //Process the file upload in Node
     form.parse(req, function (error, fields, file) {
+        var serverip = fields.ipaddress;
+        if(error)
+        {
+            console.log('error form parsing.')
+            return res.status(400).json({
+                status: 'faile',
+                message: 'there been some error',
+                error :error
+            })
+        }
         let filepath = file.fileupload.filepath;
         //let newpath = 'D:/MySpace/writtenforbirddog/flash_cameras_using_node/uploaded_files/';
         let newpath = 'C:/temp/';
@@ -46,7 +52,7 @@ router.post('/upload', function(req, res){
             var local_file_path = newpath;
             var destination_file_path = '/tmp/'+file.fileupload.originalFilename;
             client.scp(local_file_path, {
-                host: "192.168.208.51",
+                host: serverip,
                 username: 'root',
                 port: 9031,
                 password: 'bdstum01r21',
@@ -72,9 +78,6 @@ router.post('/upload', function(req, res){
             });
         });
     });
-
-    
-
 });
 
 
