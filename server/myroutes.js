@@ -3,17 +3,7 @@ const router = express.Router()
 
 router.use(express.static('public'))
 
-
-function countdown(res, count) {
-  res.write("data: " + count + "\n\n")
-  if (count)
-    setTimeout(() => countdown(res, count-1), 1000)
-  else
-    res.end()
-}
 //const io = require('./websocket.js').io()
-
-//const evtSource = new EventSource("http://localhost:3000/myroutes");
 
 var path = require('path');
 var SSH = require('simple-ssh');
@@ -34,28 +24,7 @@ router.use((req, res, next) => {
   next()
 })
 
-function executeShhCommand () {
-   
-    return new Promise((resolve, reject) => {
-        var cmd = "dpkg -i "+ destination_file_path
-        var result ;
-        ssh.exec( cmd, {
-            out: function (stdout) {
-                //res.write(stdout)
-                //result += stdout + "\n"
-                console.log(result)
-                //resolve(result);
-                },
-            }).start();
-        
-    })
-}
-async function installFirmwareOnRemote() {
-    return await executeShhCommand(host)
-
- }
-
- router.post('/upload', function(req, res){
+router.post('/upload', function(req, res){
     let form = new formidable.IncomingForm();
     form.parse(req, function (error, fields, file) {
         var serverip = fields.ipaddress;
@@ -100,9 +69,8 @@ async function installFirmwareOnRemote() {
                         console.log(stdout);
                         res.end();
                     }
-                        },
-                   })
-                   .start();
+                  },
+                }).start();
             });
         });
     });
@@ -110,19 +78,10 @@ async function installFirmwareOnRemote() {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
-        })
+    })
 });
 
-router.get('/countdown', function(req, res) {
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
-    })
-    countdown(res, 10)
-  })
-
- router.get("/", (req, res) => {
+router.get("/", (req, res) => {
     res.write("you are in routes home page: try update-firmware \n\n");
     res.end();
     //res.sendFile(path.join(__dirname+'/index.html'));
