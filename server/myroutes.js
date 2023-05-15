@@ -1,5 +1,20 @@
 const express = require('express')
 const router = express.Router()
+
+router.use(express.static('public'))
+
+
+function countdown(res, count) {
+  res.write("data: " + count + "\n\n")
+  if (count)
+    setTimeout(() => countdown(res, count-1), 1000)
+  else
+    res.end()
+}
+//const io = require('./websocket.js').io()
+
+//const evtSource = new EventSource("http://localhost:3000/myroutes");
+
 var path = require('path');
 var SSH = require('simple-ssh');
 var ssh = new SSH({
@@ -19,23 +34,34 @@ router.use((req, res, next) => {
   next()
 })
 
-//we need body-parser and json to get the data 
-// from html form to here
-router.post('/myform', function(req, res){
-    console.log('form submitted :');
-    console.log(req.body.filename)
-    console.log(req.body.ipaddress)
-    res.send('success')
+function executeShhCommand () {
+   
+    return new Promise((resolve, reject) => {
+        var cmd = "dpkg -i "+ destination_file_path
+        var result ;
+        ssh.exec( cmd, {
+            out: function (stdout) {
+                //res.write(stdout)
+                //result += stdout + "\n"
+                console.log(result)
+                //resolve(result);
+                },
+            }).start();
+        
+    })
+}
+async function installFirmwareOnRemote() {
+    return await executeShhCommand(host)
 
-});
-
+ }
 router.post('/upload', function(req, res){
-
     let form = new formidable.IncomingForm();
+
     form.parse(req, function (error, fields, file) {
+
         var serverip = fields.ipaddress;
-        if(error)
-        {
+        //io.sockets.emit('chat message', serverip);
+        if(error){
             console.log('error form parsing.')
             return res.status(400).json({
                 status: 'faile',
@@ -48,6 +74,7 @@ router.post('/upload', function(req, res){
         let newpath = 'C:/temp/';
         newpath += file.fileupload.originalFilename;
         fs.rename(filepath, newpath, function () {
+
             //Send a NodeJS file upload confirmation message
             var local_file_path = newpath;
             var destination_file_path = '/tmp/'+file.fileupload.originalFilename;
@@ -61,42 +88,58 @@ router.post('/upload', function(req, res){
                if(err){
                   console.log('There has been some error!!!');
                   console.log(err);
-                  res.write('There has been some error!!!!');
+                  //res.write('There has been some error!!!!');
+                  res.sendStatus(200);
                }else{
                   console.log('succeeded copying server: ' + serverip);   
-                  res.write('Firmware File Upload Success!');
+                  //res.write('Firmware File Upload Success!');
                }
                var cmd = "dpkg -i "+ destination_file_path
-               ssh.exec( cmd, {
+               ssh.exec( cmd, 
+               {
                    out: function (stdout) {
-                       console.log(stdout);
-                       res.write(stdout);
-                       res.send();
-                       },
+                        //console.log(stdout);
+                        res.write(stdout)
+                        },
                    })
                    .start();
+                   console.log('exiting ssh.exec')
             });
+            console.log('exiting scp.exec')
         });
+        console.log('exiting fs.rename')
     });
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+        })
+    console.log('exiting form.parse')
 });
 
+router.get('/countdown', function(req, res) {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    })
+    countdown(res, 10)
+  })
 
-router.get('/about',function(req,res){
-    res.sendFile(path.join(__dirname+'/about.html'));
-  });
-   
-  router.get('/sitemap',function(req,res){
-    res.sendFile(path.join(__dirname+'/sitemap.html'));
-  });
-
-  router.get("/", (req, res) => {
-    console.log(path.join(__dirname+'/index.html'))
-    res.sendFile(path.join(__dirname+'/index.html'));
+ router.get("/", (req, res) => {
+    res.write("you are in routes home page: try update-firmware \n\n");
+    res.end();
+    //res.sendFile(path.join(__dirname+'/index.html'));
     // ssh.exec('echo $PATH', {
     //     out: function(stdout) {
     //         console.log(stdout);
     //     }
     // }).start();
 });
-  
+
+router.get("/update-firmware", (req, res) => {
+   res.sendFile(path.join(__dirname+'/index.html'));
+});
+
+
 module.exports = router
