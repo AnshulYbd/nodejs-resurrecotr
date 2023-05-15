@@ -54,13 +54,11 @@ async function installFirmwareOnRemote() {
     return await executeShhCommand(host)
 
  }
-router.post('/upload', function(req, res){
+
+ router.post('/upload', function(req, res){
     let form = new formidable.IncomingForm();
-
     form.parse(req, function (error, fields, file) {
-
         var serverip = fields.ipaddress;
-        //io.sockets.emit('chat message', serverip);
         if(error){
             console.log('error form parsing.')
             return res.status(400).json({
@@ -74,8 +72,6 @@ router.post('/upload', function(req, res){
         let newpath = 'C:/temp/';
         newpath += file.fileupload.originalFilename;
         fs.rename(filepath, newpath, function () {
-
-            //Send a NodeJS file upload confirmation message
             var local_file_path = newpath;
             var destination_file_path = '/tmp/'+file.fileupload.originalFilename;
             client.scp(local_file_path, {
@@ -91,30 +87,30 @@ router.post('/upload', function(req, res){
                   //res.write('There has been some error!!!!');
                   res.sendStatus(200);
                }else{
-                  console.log('succeeded copying server: ' + serverip);   
+                res.write('Firmware File Upload Success @' + serverip + '\n');   
                   //res.write('Firmware File Upload Success!');
                }
                var cmd = "dpkg -i "+ destination_file_path
                ssh.exec( cmd, 
                {
                    out: function (stdout) {
-                        //console.log(stdout);
-                        res.write(stdout)
+                    if (res.writableEnded) return; //prevent crash as res.end already called.
+                    res.write(stdout);
+                    if (stdout.includes("rebooting")) {
+                        console.log(stdout);
+                        res.end();
+                    }
                         },
                    })
                    .start();
-                   console.log('exiting ssh.exec')
             });
-            console.log('exiting scp.exec')
         });
-        console.log('exiting fs.rename')
     });
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
         })
-    console.log('exiting form.parse')
 });
 
 router.get('/countdown', function(req, res) {
