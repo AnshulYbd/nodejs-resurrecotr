@@ -14,7 +14,24 @@
   </head>
   <body>
     <fieldset>
-      <h3>upload new firmware</h3>
+      <legend>Resurrect Camera</legend>
+        <form action="/myroutes/upload" method="post" >
+        <label>Build Firmware Version</label>
+        <input type="text" id="fwVersion" name="fwVersion" required>
+        <div>
+          <input type="checkbox" id="builddpkg" name="builddpkg" checked value="dpkgon">
+          <label for="builddpkg">Build Debian</label>
+        </div>
+        <br>
+        <label>Deploy at camera IP</label>
+        <input type="text" id="ipaddress" name="ipaddress" >
+        <br><br>
+        <input type="submit">
+      </form>
+    </fieldset>
+
+    <!-- <fieldset>
+      <h3>Resurrect camera </h3>
       <form action="/myroutes/upload" method="post" enctype="multipart/form-data">
         <label>Camera IP</label>
         <input type="text" id="ipaddress" name="ipaddress" required>
@@ -23,7 +40,7 @@
         <br><br>
         <input type="submit">
       </form>
-    </fieldset>
+    </fieldset> -->
     <!-- <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
