@@ -40,15 +40,16 @@ router.post('/upload', function(req, res){
   }   
   cmd_build_fw = cmd_build_fw + " " + dpkgstatus 
 
-  if (req.body.builddpkg )
+  if (req.body.ipaddress )
   {
     cmd_build_fw = cmd_build_fw + " " + req.body.ipaddress
   } 
-  console.log(cmd_build_fw)
+  //console.log("command to execute on qemu : "+cmd_build_fw)
   ssh.exec( cmd_build_fw, 
   {
       out: function (stdout) {
       if (!res.writableEnded) {
+        console.log(stdout)
         res.write(stdout);
       }
       if (stdout.includes("Finished.")) {
