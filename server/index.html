@@ -18,6 +18,8 @@
         <form action="/myroutes/upload" method="post" >
         <label>Build Firmware Version</label>
         <input type="text" id="fwVersion" name="fwVersion" required>
+        <input type="checkbox" id="prerelease" name="prerelease" checked value="internal">
+        <label for="prerelease">Pre release</label>
         <div>
           <input type="checkbox" id="builddpkg" name="builddpkg" checked value="dpkgon">
           <label for="builddpkg">Build Debian</label>

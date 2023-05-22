@@ -36,7 +36,7 @@ router.post('/upload', function(req, res){
   var dpkgstatus = "dpkgoff"
   if (req.body.builddpkg )
   {
-      dpkgstatus = req.body.builddpkg
+    dpkgstatus = req.body.builddpkg
   }   
   cmd_build_fw = cmd_build_fw + " " + dpkgstatus 
 
@@ -44,6 +44,12 @@ router.post('/upload', function(req, res){
   {
     cmd_build_fw = cmd_build_fw + " " + req.body.ipaddress
   } 
+  var releasetag = "public"
+  if (req.body.prerelease )
+  {
+    releasetag = req.body.prerelease
+  }
+  cmd_build_fw = cmd_build_fw + " " + releasetag 
   //console.log("command to execute on qemu : "+cmd_build_fw)
   ssh.exec( cmd_build_fw, 
   {
